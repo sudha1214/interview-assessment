@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en-US">
+	<head>
+		<link rel="stylesheet" type="text/css" href="css/styles.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+		<script>
+			var selected_user_id = -1;
+			var groups_id_names = [];
+			var depts_id_names = [];
+			var available_group_tags = [];
+			var available_dept_tags = [];
+			function get_group_id(group_name) {
+				for (var i = 0; i < groups_id_names.length; i++) {
+					if (group_name == groups_id_names[i].name) {
+						return groups_id_names[i].id;
+					}
+				}
+			}
+			function get_dept_name(dept_id) {
+				for (var i = 0; i < depts_id_names.length; i++) {
+					if (dept_id == depts_id_names[i].id) {
+						return depts_id_names[i].name;
+					}
+				}				
+			}
+			function sortJSON(data, key) {
+				return data.sort(function(a, b) {
+					var x = a[key];
+					var y = b[key];
+					return ((x < y) ? -1 : ((x > y) ? 1 : 0));
+				});
+			}
+
+			function modify_delete_user(user_id) {
+				selected_user_id = user_id;
+				console.log("Selected user id:" + selected_user_id)
+				$('#edit_delete_dialog').dialog('open');
+			}			
+			function editUser(user_id) {
+				console.log(user_id);
+				var user_email = '';
+				var user_name = '';
+				var user_groups = '';
+				var user_department = '';
+				var user_department_id ='';
+				$.ajax({
+            		async: false,
+            		type: "GET",
+            		dataType: "json",
+            		url: "/api/users/" + user_id,
+            		success: function(result) {
+						if (result !=null && result.length != 0) {
+						 	user_email = result.emailAddress;
+						 	user_name = result.name;
+						 	user_department = result.department.name;
+						 	user_department_id = result.department.id;
+						 	var i = 0;
+						 	for (i = 0; i < result.groups.length; i++) {
+						 		user_groups += result.groups[i].name + ",";
+						 	}
+						 	user_groups = $.trim(user_groups);
+						 	if (user_groups[user_groups.length - 1] == ",") {
+						 		user_groups = user_groups.slice(0, -1);	
+						 	}						 	
+						}
+            		}
+            	});
+            	$('#userId').val(user_email);
+            	$('#userName').val(user_name);
+            	$('#userGroups').val(user_groups);
+            	var options = '';
+            	for (var i = 0; i < depts_id_names.length; i++) {
+            		if (depts_id_names[i].id == user_department_id) {
+            			options += '<option selected="selected" value="' + depts_id_names[i].id + '">' + depts_id_names[i].name + '</option>';
+            		} else {
+            			options += '<option value="' + depts_id_names[i].id + '">' + depts_id_names[i].name + '</option>';
+            		}
+            	}
+            	$('#userDepartment').html(options);
+			}
+			function populateTable(result, queryString) {
+				if (result != null && result.length != 0) {
+					result = sortJSON(result, 'name');
+					var html = '<tbody>';
+					var i = 0;
+					for ( i = 0; i < result.length; i++) {
+						var j = 0;
+						var groups = '';
+						html += '<tr>';
+						html += '<td>' + parseInt(i+1, 10) + '</td>';
+						html += '<td>' + result[i].emailAddress + '</td>';
+						html += '<td>' + result[i].name + '</td>';
+						result[i].groups = sortJSON(result[i].groups, 'name');
+						for ( j = 0; j < result[i].groups.length; j++) {
+							groups += result[i].groups[j].name + ", ";
+						}
+						groups = groups.slice(0, -2);
+						html += '<td>' + groups + '</td>';
+						html += '<td>' + result[i].department.name + '</td>';	
+						html += '<td><a class="editUser" onclick="modify_delete_user(' + result[i].id + ')" href="#" id=' + result[i].id + '>&#9660;</></td>';
+						html += '</tr>';						
+					}
+					html += '</tbody>';
+					$('#dataTable').html(html);
+				} else {
+					var html = '<tbody id="notFound">';
+					html += '<tr>';
+					html += '<td>' + 'User ' + queryString + ' is not found</td>';
+					html += '</tr>';
+					html += '</tbody>';
+					$('#dataTable').html(html);				
+				}				
+			}
+
+			$(document).ready(function() {
+        		$('#dialog').dialog({
+            		autoOpen: false,
+            		width: 900,
+            		resizable: false,
+            		modal: true            
+    	    	});
+
+        		$('#edit_delete_dialog').dialog({
+            		autoOpen: false,
+            		width: 270,
+            		height: 75,
+            		resizable: false,
+            		modal: true            
+    	    	});
+
+		    	$('#edit_button').click(function () {
+					editUser(selected_user_id);	
+					$('#edit_delete_dialog').dialog('close');    		
+		           	$('#dialog').dialog('open');   
+        		});
+
+		    	$('#delete_button').click(function () {
+					$.ajax({
+						async: false,
+						type: "DELETE",
+						dataType: "json",
+						url: "/api/users/" + selected_user_id,
+						success: function(result) {
+							console.log("Deleted user successfully " + selected_user_id);
+							$.getJSON("/api/users", function(result) {
+								populateTable(result, ""); 
+							});														
+						}
+					});
+					$('#edit_delete_dialog').dialog('close');    		   
+        		});
+
+		    	$('#save_button').click(function () {
+		    		email_id = $('#userId').val();
+		    		user_name = $('#userName').val();
+		    		user_groups = $('#userGroups').val();
+		    		user_dept_id = $('#userDepartment').val();
+
+		    		if (email_id != '' &&
+		    			user_name != '' &
+		    			user_groups != '') {
+		    			var json_obj1 = {};
+						var json_obj2 = {};
+								    			
+		    			json_obj1["emailAddress"] = email_id;
+		    			json_obj1["name"] = user_name;
+		    			
+		    			var length = user_groups.length;
+		    			if (user_groups[length -2] == ",") {
+		    				user_groups = user_groups.slice(0, -2);
+		    			}
+		    					    			
+		    			user_groups = user_groups.split(",");						
+						var temp = [];
+		    			for (var i = 0; i < user_groups.length; i++) {
+		    				var item = {};
+		    				item["id"] = get_group_id($.trim(user_groups[i]));
+		    				item["name"] = user_groups[i];
+		    				temp.push(item);
+		    			} 		    			
+		    			json_obj1["groups"] = temp;
+		    			
+		    			temp = {};	
+		    			temp["id"] = user_dept_id;
+		    			temp["name"] = get_dept_name(user_dept_id);
+		    			json_obj1["department"] = temp;
+		    			
+		    			if (selected_user_id != -1) {
+		    				json_obj1["id"] = selected_user_id; 
+		    			}
+		    			
+		    			var method_type = "PUT";
+		    			var api_url = "/api/users/" + + selected_user_id;
+		    			if (selected_user_id == -1) {
+		    				method_type = "POST";
+		    				api_url = "/api/users";
+		    			}
+		    			
+		    			$.ajax({
+            				async: false,
+            				type: method_type,
+            				data: JSON.stringify(json_obj1),
+            				dataType: "json",
+            				contentType: 'application/json',
+            				url: api_url,
+            				success: function(result) {
+								$.getJSON("/api/users", function(result) {
+									populateTable(result, ""); 
+								});
+            				}		    				
+		    			});
+		    			console.log(JSON.stringify(json_obj1));
+						$('#dialog').dialog('close');		    			
+		    		} else {
+		    			if (email_id == '') {
+		    				$('#userId').attr("placeholder", "Input User Email Id");
+		    			} else if (user_name == '') {
+		    				$('#userName').attr("placeholder", "Input User Name");
+		    			} else if (user_groups == '') {
+		    				$('#userGroups').attr("placeholder", "Input User Groups");
+		    			}
+		    			console.log("Input is null");		    			
+		    		}
+        		});
+
+		    	$('#cancel_button').click(function () {
+		    		$('#dialog').dialog('close');
+		    	});
+		    	$('#newUser').click(function () {
+		    		selected_user_id = -1;
+            		$('#userId').val('');
+            		$('#userName').val('');
+            		$('#userGroups').val('');
+            		
+            		var options = '';
+            		for (var i = 0; i < depts_id_names.length; i++) {
+            			options += '<option value="' + depts_id_names[i].id + '">' + depts_id_names[i].name + '</option>';
+            		}
+            		$('#userDepartment').html(options);
+		           	$('#dialog').dialog('open');   
+        		});
+
+        		$("#searchUser").keypress(function (event) {       			
+        			if(event.which == '13') {
+        				var queryString = this.value;            			
+            			$.ajax({
+            				async: false,
+            				type: "GET",
+            				dataType: "json",
+            				url: "/api/users?search=" + queryString,
+            				success: function(result) {
+								populateTable(result, queryString);
+            				}
+            			});
+        			}
+        			event.stopPropagation();
+				});
+        		
+				$.getJSON("/api/users", function(result) {
+					populateTable(result, ""); 
+				});
+				$.getJSON("/api/groups", function(result) {
+					var obj = $.parseJSON(JSON.stringify(result));
+					obj = sortJSON(obj, 'id');
+					$.each(obj, function(key, value) {
+						groups_id_names.push({id: value.id, name: value.name});
+						available_group_tags.push(value.name);						
+					});			
+				});				
+				$.getJSON("/api/departments", function(result) {
+					var obj = $.parseJSON(JSON.stringify(result));
+					obj = sortJSON(obj, 'id');										
+					$.each(obj, function(key, value) {
+						depts_id_names.push({id: value.id, name: value.name});
+						available_dept_tags.push(value.name);
+					});				 
+				});
+    			
+    			function split( val ) {
+      				return val.split( /,\s*/ );
+    			}
+    			function extractLast( term ) {
+      				return split( term ).pop();
+    			}
+ 
+    			$( "#userGroups" )
+      				// don't navigate away from the field on tab when selecting an item
+      				.bind( "keydown", function( event ) {
+        			if ( event.keyCode === $.ui.keyCode.TAB &&
+            			$( this ).data( "ui-autocomplete" ).menu.active ) {
+          					event.preventDefault();
+        				}
+      				})
+      				.autocomplete({
+        				minLength: 0,
+        				source: function( request, response ) {
+          				// delegate back to autocomplete, but extract the last term
+          				response( $.ui.autocomplete.filter(
+            			available_group_tags, extractLast( request.term ) ) );
+        			},
+        			focus: function() {
+          				// prevent value inserted on focus
+          				return false;
+        			},
+        			select: function( event, ui ) {
+          				var terms = split( this.value );
+          				// remove the current input
+          				terms.pop();
+          				// add the selected item
+          				terms.push( ui.item.value );
+          				// add placeholder to get the comma-and-space at the end
+          				terms.push( "" );
+          				this.value = terms.join( ", " );
+          				return false;
+        			}
+      			});
+  			});													  
+		</script>
+		<meta charset="UTF-8"/>
+		<title>ZUsers</title>
+		<meta charset="UTF-8" />
+		<meta name="google" content="notranslate">
+		<meta http-equiv="Content-Language" content="en" />
+	</head>
+	<body>
+		<header>
+			<p id="name">
+				User Management
+			</p>
+			<div class="wrapper">
+				<div id = "t">
+					<div id="row1">
+						<input type="submit" class="addbutton" id="newUser" value="Add" />
+						<span id="search"> </span>
+						<input type="search" id="searchUser" placeholder="Search"/>
+					</div>
+					<!-- end of row1 -->
+				</div>
+				<table class="table1">
+					<tr>
+						<th align="left" style="width: 3em;">&nbsp;&nbsp;#</th>
+						<th align="left" style="width: 17em;">Email Address</th>
+						<th align="left" style="width: 11.4em;">User Name</th>
+						<th align="left" style="width: 19em;">Groups</th>
+						<th align="left">Department</th>
+						<th align="left"></th>
+					</tr>
+				</table>
+				<div style="overflow: auto;height: 470px; width: 850px;">
+					<table class="myTable" id="dataTable" style="overflow:auto; width: 830px;"></table>
+				</div>
+				<div id="dialog" class="wrapper">
+					<div id="editwrapper">
+						<p id="edit"> Edit User</p>
+      					<div id="general">
+      						<p style="color:#737373;"> General
+      					</p>
+      					<table id="editTable">
+      						<tr> <td class="col1">User ID</td> <td class="col2"><input type="text" id="userId" class="col2" style="height:100%;"/></td></tr>
+      						<tr> <td class="col1">User Name</td> <td class="col2"><input type="text" id="userName" class="col2" style="height:100%;"/></td></tr>
+      						<tr> <td class="col1">Groups</td> <td class="col2"><input type="text" id="userGroups" class="col2" style="height:100%;"/></td></tr>
+      						<tr> <td class="col1">Department</td> 
+      							<td class="col2">
+      								<select class="col2" id="userDepartment" style="height:100%;">
+      								</select>
+      							</td>
+      						</tr>
+      					</table>
+      					</div> <!-- close of general -->
+      					<div id="editbuttons">
+      					<table>
+      						<tr>
+      							<td><input type="submit" class="addbutton savebutton"    id="save_button" value="Save" style="margin-top: 280px; margin-left: 550px;"/> </td>
+      							<td><input type="submit" class="cancelbutton savebutton" id="cancel_button" value="Cancel" style="	margin-top: 280px;"/> </td>
+      						</tr>
+      					</table>      		      		
+      				</div>
+				</div>
+				</div>
+				
+				<div id="edit_delete_dialog" class="modify_dialog_wrapper">
+					<table>
+					<tr>
+      				<td><input type="submit" class="addbutton dialog_modify_button" id="edit_button" value="Edit"/> </td>
+      				<td><input type="submit" class="addbutton dialog_modify_button" id="delete_button" value="Delete"/> </td>
+      				</tr>
+      				</table>      		      		
+      			</div>
+			</div>
+		</header>
+	</body>
+</html>

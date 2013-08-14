@@ -1,0 +1,230 @@
+[
+    {
+        "id": 1,
+        "name": "Marina Powell",
+        "emailAddress": "marinapowell@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 3,
+                "name": "Sales Engineers"
+            }
+        ],
+        "department": {
+            "id": 2,
+            "name": "Quality Assurance"
+        }
+    },
+    {
+        "id": 2,
+        "name": "Lola Ferrell",
+        "emailAddress": "lolaferrell@zscaler.com",
+        "groups": [
+            {
+                "id": 3,
+                "name": "Sales Engineers"
+            },
+            {
+                "id": 2,
+                "name": "Engineering Leads"
+            }
+        ],
+        "department": {
+            "id": 3,
+            "name": "Product Management"
+        }
+    },
+    {
+        "id": 3,
+        "name": "Ada Gates",
+        "emailAddress": "adagates@zscaler.com",
+        "groups": [
+            {
+                "id": 1,
+                "name": "Executive Team"
+            },
+            {
+                "id": 3,
+                "name": "Sales Engineers"
+            }
+        ],
+        "department": {
+            "id": 7,
+            "name": "Customer Support"
+        }
+    },
+    {
+        "id": 4,
+        "name": "Lea Giles",
+        "emailAddress": "leagiles@zscaler.com",
+        "groups": [
+            {
+                "id": 1,
+                "name": "Executive Team"
+            },
+            {
+                "id": 4,
+                "name": "QA Leads"
+            }
+        ],
+        "department": {
+            "id": 3,
+            "name": "Product Management"
+        }
+    },
+    {
+        "id": 5,
+        "name": "Becky Macias",
+        "emailAddress": "beckymacias@zscaler.com",
+        "groups": [
+            {
+                "id": 1,
+                "name": "Executive Team"
+            },
+            {
+                "id": 2,
+                "name": "Engineering Leads"
+            }
+        ],
+        "department": {
+            "id": 1,
+            "name": "Engineering"
+        }
+    },
+    {
+        "id": 6,
+        "name": "Lori Miller",
+        "emailAddress": "lorimiller@zscaler.com",
+        "groups": [
+            {
+                "id": 2,
+                "name": "Engineering Leads"
+            },
+            {
+                "id": 4,
+                "name": "QA Leads"
+            }
+        ],
+        "department": {
+            "id": 1,
+            "name": "Engineering"
+        }
+    },
+    {
+        "id": 7,
+        "name": "Alejandra Whitehead",
+        "emailAddress": "alejandrawhitehead@zscaler.com",
+        "groups": [
+            {
+                "id": 1,
+                "name": "Executive Team"
+            },
+            {
+                "id": 4,
+                "name": "QA Leads"
+            }
+        ],
+        "department": {
+            "id": 2,
+            "name": "Quality Assurance"
+        }
+    },
+    {
+        "id": 8,
+        "name": "Drake Williams",
+        "emailAddress": "drakewilliams@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 1,
+                "name": "Executive Team"
+            }
+        ],
+        "department": {
+            "id": 6,
+            "name": "Operations"
+        }
+    },
+    {
+        "id": 9,
+        "name": "Kara Stout",
+        "emailAddress": "karastout@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 1,
+                "name": "Executive Team"
+            }
+        ],
+        "department": {
+            "id": 7,
+            "name": "Customer Support"
+        }
+    },
+    {
+        "id": 10,
+        "name": "Gilmore Pratt",
+        "emailAddress": "gilmorepratt@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 2,
+                "name": "Engineering Leads"
+            }
+        ],
+        "department": {
+            "id": 1,
+            "name": "Engineering"
+        }
+    },
+    {
+        "id": 11,
+        "name": "Kaye Barrett",
+        "emailAddress": "kayebarrett@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 1,
+                "name": "Executive Team"
+            }
+        ],
+        "department": {
+            "id": 6,
+            "name": "Operations"
+        }
+    },
+    {
+        "id": 12,
+        "name": "Aline Edwards",
+        "emailAddress": "alineedwards@zscaler.com",
+        "groups": [
+            {
+                "id": 4,
+                "name": "QA Leads"
+            },
+            {
+                "id": 2,
+                "name": "Engineering Leads"
+            }
+        ],
+        "department": {
+            "id": 3,
+            "name": "Product Management"
+        }
+    }
+]
