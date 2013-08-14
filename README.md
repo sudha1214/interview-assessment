@@ -1,5 +1,3 @@
-# Zscaler UI Candidate Project
-
 ## Objective
 
 Your goal is to build a simple CRUD-type web app that will be used to manage user accounts for some company.
@@ -40,8 +38,3 @@ Instructions for deploying the web app to Apache Tomcat:
 Place any HTML, JavaScript, and CSS files you create in *{TOMCAT_INSTALL_LOCATION}/webapps/ROOT* to test the front-end you build with the REST API.
 You can add/modify web files in the ROOT directory while Tomcat is running; just refresh the browser to see your changes.
 
-## Submitting Your Project
-
-Please submit your project to [Dan Staringer](<dstaringer@zscaler.com>) and [Braeden Partridge](<bpartridge@zscaler.com>) as a single ZIP file.
-
-There's no need to re-submit the already provided files.  Just zip up and send the files/folders you added to the ROOT parent folder.
